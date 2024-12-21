@@ -5,6 +5,10 @@ const userSchema = new mongoose.Schema({
   fullname: { type: String, required: true },
   domain: { type: String, required: true },
   mentor: { type: String }, // Could reference an Admin or User (depending on design)
+  password: {
+    type: String,
+    required: true
+  },
   taskDone: {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
     default: []  // Default empty array when user is created
@@ -12,7 +16,7 @@ const userSchema = new mongoose.Schema({
   taskAssign: {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
     default: []  // Default empty array when user is created
-  }
+  },
 });
 
 export default mongoose.model('User', userSchema);

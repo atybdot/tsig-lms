@@ -6,6 +6,9 @@ const router = express.Router();
 // Create a new user
 router.post('/', UserController.create);
 
+// Create Multiple Users
+router.post('/many', UserController.createMany);
+
 // Get all users
 router.get('/', UserController.getAll);
 
