@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [fullname, setFullname] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ fullname: fullname.trim() })
+        body: JSON.stringify({ fullname: fullname.trim(), password })
       });
 
       const data = await response.json();
@@ -59,6 +60,21 @@ const Login = () => {
                 id="fullname"
                 value={fullname}
                 onChange={(e) => setFullname(e.target.value)}
+                className="mt-2 block w-full rounded-md border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                placeholder="Enter your full name"
+                required
+              />
+              <label 
+                htmlFor="password" 
+                className="block text-sm font-medium text-gray-700"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="mt-2 block w-full rounded-md border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
                 placeholder="Enter your full name"
                 required

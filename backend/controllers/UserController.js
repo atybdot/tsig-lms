@@ -1,4 +1,5 @@
 import User from '../models/UserModel.js';
+import bcrypt from 'bcrypt';
 
 const UserController = {
   // Create a new user
@@ -8,6 +9,38 @@ const UserController = {
       const savedUser = await user.save();
       res.status(201).json(savedUser);
     } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
+
+  createMany: async (req, res) => {
+    try {
+      const users = req.body; // Expecting an array of user objects
+      console.log('Received users:', users); // Log incoming users
+
+      // Validate user input
+      for (const user of users) {
+        if (!user.password) {
+          return res.status(400).json({ message: 'All fields (fullname, email, password) are required for each user' });
+        }
+      }
+
+      const salt = await bcrypt.genSalt(10);
+
+      // Hash passwords and prepare users for insertion
+      const hashedUsers = await Promise.all(users.map(async (user) => {
+        const hashedPassword = await bcrypt.hash(user.password, salt);
+        return {
+          ...user,
+          password: hashedPassword // Set the hashed password
+        };
+      }));
+
+      // Insert all users with hashed passwords into the database
+      const newUsers = await User.insertMany(hashedUsers);
+      res.status(201).json(newUsers);
+    } catch (error) {
+      console.error('Error creating users:', error); // Log the error
       res.status(400).json({ message: error.message });
     }
   },
@@ -78,35 +111,44 @@ const UserController = {
   // Get one user by fullname
   getOneUser: async (req, res) => {
     try {
-      const { fullname } = req.body;
-      
-      if (!fullname) {
+      const { fullname,password } = req.body;
+
+      if (!fullname || !password) {
         return res.status(400).json({ 
           success: false,
-          message: 'Fullname is required' 
+          message: 'Fullname and password is required' 
         });
       }
 
-      const user = await User.findOne({ fullname })
+      const cmpUser = await User.findOne({ fullname })
         .populate('taskDone')
         .populate('taskAssign');
 
-      if (!user) {
+      if (!cmpUser) {
         return res.status(404).json({ 
           success: false,
           message: 'User not found' 
+        });
+      }
+      
+      const match = await bcrypt.compare(password, cmpUser.password);
+
+      if (!match) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'Fullname or password is incorrect' 
         });
       }
 
       res.json({
         success: true,
         user: {
-          _id: user._id,
-          id: user.id,
-          fullname: user.fullname,
-          domain: user.domain,
-          taskDone: user.taskDone,
-          taskAssign: user.taskAssign
+          _id: cmpUser._id,
+          id: cmpUser.id,
+          fullname: cmpUser.fullname,
+          domain: cmpUser.domain,
+          taskDone: cmpUser.taskDone,
+          taskAssign: cmpUser.taskAssign
         }
       });
     } catch (error) {
