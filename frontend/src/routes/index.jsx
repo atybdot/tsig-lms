@@ -2,35 +2,38 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import Dashboard from '../pages/Dashboard';
 import Login from '../pages/Login';
-import ProtectedRoute from '../components/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Login />,
+    element: <AuthWrapper notUser={false}><Login /></AuthWrapper>,
   },
   {
     path: '/dashboard',
-    element: (
-      <ProtectedRoute>
-        <DashboardLayout />
-      </ProtectedRoute>
-    ),
+    element: <AuthWrapper><DashboardLayout /></AuthWrapper>,
     children: [
       {
         path: ':userId',
-        element: <Dashboard />
+        element: <AuthWrapper><Dashboard /></AuthWrapper>,
       },
-      {
-        index: true,
-        element: <Navigate to="/" replace />
-      }
-    ]
+    ],
   },
   {
     path: '*',
-    element: <Navigate to="/" replace />
-  }
+    element: <Navigate to="/" replace />,
+  },
 ]);
 
-export default router; 
+function AuthWrapper({ children, path = '/dashboard', notUser = true }) {
+  const user = JSON.parse(localStorage.getItem('userData'));
+  if (notUser) {
+    if (!user) return <Navigate to="/" replace />;
+    // if (path === '/') return <Navigate to={`/dashboard/${user.id}`} replace />;
+  } else {
+    if (user) return <Navigate to={`/dashboard/${user.id}`} replace />;
+    // if (path === '/') return <Navigate to="/" replace />;
+  }
+  return children;
+}
+
+export default router;
