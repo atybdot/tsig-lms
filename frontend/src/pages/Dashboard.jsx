@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, useOutletContext } from 'react-router-dom';
 import TaskModal from '../components/TaskModal';
 
 const Dashboard = () => {
   const { userId } = useParams();
+  const { setIsSidebarOpen } = useOutletContext();
   const [userData, setUserData] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState({
@@ -18,6 +19,7 @@ const Dashboard = () => {
 
   // Get user data from localStorage
   useEffect(() => {
+    
     const storedUser = localStorage.getItem('userData');
     if (storedUser) {
       setUserData(JSON.parse(storedUser));
@@ -121,73 +123,82 @@ const Dashboard = () => {
   }
 
   return (
-    <div>
-      <h2 className="mb-6 text-2xl font-bold">
-        Welcome, {userData?.fullname || 'User'}
-      </h2>
+    <div className="flex sm:w-full sm:z-0">
+      {/* <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} /> */}
       
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-lg bg-white p-6 shadow-md">
-          <h3 className="text-sm font-medium text-gray-500">Total Tasks</h3>
-          <p className="mt-2 text-3xl font-bold">{stats.total}</p>
-        </div>
-        
-        <div className="rounded-lg bg-white p-6 shadow-md">
-          <h3 className="text-sm font-medium text-gray-500">Pending Tasks</h3>
-          <p className="mt-2 text-3xl font-bold">{stats.pending}</p>
-        </div>
-        
-        <div className="rounded-lg bg-white p-6 shadow-md">
-          <h3 className="text-sm font-medium text-gray-500">Completed Tasks</h3>
-          <p className="mt-2 text-3xl font-bold">{stats.completed}</p>
-        </div>
-      </div>
+      <div className="flex-1 p-4">
+        {/* Hamburger Icon */}
+        <button onClick={setIsSidebarOpen} className="md:hidden p-2 text-gray-600">
+          ☰
+        </button>
 
-      {/* Tasks List */}
-      <div className="mt-8 rounded-lg bg-white p-6 shadow-md">
-        <h3 className="mb-4 text-lg font-medium">Your Tasks</h3>
-        <div className="space-y-4">
-          {tasks.map((task) => (
-            <div 
-              key={task._id}
-              onClick={() => handleTaskClick(task)}
-              className="flex cursor-pointer items-center justify-between rounded-lg border p-4 hover:bg-gray-50"
-            >
-              <div>
-                <p className="font-medium">{task.title}</p>
-                <p className="text-sm text-gray-500">{task.description}</p>
-              </div>
-              <span 
-                className={`rounded-full px-2 py-1 text-xs ${
-                  task.status === true 
-                    ? 'bg-green-100 text-green-800' 
-                    : task.status === false 
-                    ? 'bg-red-100 text-red-800' 
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}
+        <h2 className="mb-6 text-2xl font-bold">
+          Welcome, {userData?.fullname || 'User'}
+        </h2>
+        
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h3 className="text-sm font-medium text-gray-500">Total Tasks</h3>
+            <p className="mt-2 text-3xl font-bold">{stats.total}</p>
+          </div>
+          
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h3 className="text-sm font-medium text-gray-500">Pending Tasks</h3>
+            <p className="mt-2 text-3xl font-bold">{stats.pending}</p>
+          </div>
+          
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h3 className="text-sm font-medium text-gray-500">Completed Tasks</h3>
+            <p className="mt-2 text-3xl font-bold">{stats.completed}</p>
+          </div>
+        </div>
+
+        {/* Tasks List */}
+        <div className="mt-8 rounded-lg bg-white p-6 shadow-md">
+          <h3 className="mb-4 text-lg font-medium">Your Tasks</h3>
+          <div className="space-y-4">
+            {tasks.map((task) => (
+              <div 
+                key={task._id}
+                onClick={() => handleTaskClick(task)}
+                className="flex cursor-pointer items-center justify-between rounded-lg border p-4 hover:bg-gray-50"
               >
-                {task.status === true 
-                  ? 'Completed' 
-                  : task.status === false 
-                  ? 'Incomplete' 
-                  : 'Pending'}
-              </span>
-            </div>
-          ))}
+                <div>
+                  <p className="font-medium">{task.title}</p>
+                  <p className="text-sm text-gray-500">{task.description}</p>
+                </div>
+                <span 
+                  className={`rounded-full px-2 py-1 text-xs ${
+                    task.status === true 
+                      ? 'bg-green-100 text-green-800' 
+                      : task.status === false 
+                      ? 'bg-red-100 text-red-800' 
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}
+                >
+                  {task.status === true 
+                    ? 'Completed' 
+                    : task.status === false 
+                    ? 'Incomplete' 
+                    : 'Pending'}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Task Modal */}
-      <TaskModal
-        isOpen={isModalOpen}
-        task={selectedTask}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedTask(null);
-        }}
-        onSubmit={handleTaskSubmit}
-      />
+        {/* Task Modal */}
+        <TaskModal
+          isOpen={isModalOpen}
+          task={selectedTask}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedTask(null);
+          }}
+          onSubmit={handleTaskSubmit}
+        />
+      </div>
     </div>
   );
 };
