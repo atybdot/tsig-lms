@@ -1,7 +1,7 @@
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [userData, setUserData] = useState(null);
@@ -37,7 +37,12 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-white shadow-lg">
+    <aside className={`fixed left-0 top-0 h-screen bg-white shadow-lg transition-transform duration-300 w-full ${isOpen ? 'sm:w-full lg:w-64 md:w-64' : 'w-64 md:w-64 lg:w-64'} ${isOpen ? 'translate-x-0' : '-translate-x-[135%]'} md:translate-x-0`}>
+      {/* Close Button for Mobile */}
+      <button onClick={toggleSidebar} className="absolute top-4 right-4 md:hidden">
+        <span className="text-gray-600">✖</span>
+      </button>
+
       {/* Logo/Brand */}
       <div className="p-4">
         <h1 className="text-xl font-bold text-gray-800">TSIG CMS</h1>
