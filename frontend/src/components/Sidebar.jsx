@@ -10,12 +10,21 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     const storedUser = localStorage.getItem('userData');
     if (storedUser) {
       setUserData(JSON.parse(storedUser));
+    } else {
+      setUserData(JSON.parse(localStorage.getItem('adminData')));
     }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('userData');
-    navigate('/');
+    const storedUser = localStorage.getItem('userData');
+    if (storedUser) {
+      localStorage.removeItem('userData');
+      navigate('/');
+    } else {
+      localStorage.removeItem('adminData');
+      navigate('/admin');
+    }
+    setUserData(null);
   };
 
   const menuItems = [
@@ -60,6 +69,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               ) : (
                 <NavLink
                   to={item.path}
+                  onClick={toggleSidebar}
                   className="flex items-center space-x-2 rounded-lg p-2 text-gray-600 hover:bg-gray-100 transition-colors"
                 >
                   <span className='hover:cursor-pointer'>{item.label}</span>

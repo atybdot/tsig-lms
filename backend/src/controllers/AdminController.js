@@ -14,6 +14,34 @@ const AdminController = {
     }
   },
 
+  signin: async (req, res) => {
+    try {
+      const { username, password } = req.body;
+
+      console.log(username,password);
+
+      if (!username || !password) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'username and password is required' 
+        });
+      }
+
+      const admin = await Admin.findOne({ id: password });
+
+      if (admin.fullname != username || !admin) {
+        return res.status(404).json({ 
+          success: false,
+          message: 'User not found' 
+        });
+      }
+      
+      res.status(200).json(admin);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
   // Get all admins
   getAll: async (req, res) => {
     try {
@@ -27,6 +55,9 @@ const AdminController = {
   // Get admin by ID
   getById: async (req, res) => {
     try {
+      const { name, password } = req.body;
+      const id = password.split('@')[1];
+      console.log(id);
       const admin = await Admin.findOne({ id: req.params.id });
       if (!admin) return res.status(404).json({ message: 'Admin not found' });
       res.json(admin);
@@ -93,7 +124,7 @@ const AdminController = {
       res.status(201).json({
         message: 'Task created and assigned successfully',
         task: savedTask,
-        assignedTo: user.fullname
+        assignedTo: user.username
       });
     } catch (error) {
       res.status(400).json({ message: error.message });

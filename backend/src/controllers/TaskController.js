@@ -5,8 +5,13 @@ const TaskController = {
   // Create a new task
   create: async (req, res) => {
     try {
+      const { user_id } = req.body;
       const task = new Task(req.body);
       const savedTask = await task.save();
+      const user = await User.findOne({ id: user_id });
+      console.log(user);
+      user.taskAssign.push(savedTask.id);
+      await user.save();
       res.status(201).json(savedTask);
     } catch (error) {
       res.status(400).json({ message: error.message });
