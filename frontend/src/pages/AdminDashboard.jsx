@@ -12,7 +12,7 @@ const AdminDashboard = () => {
   const fetchMentees = async () => {
     const user = JSON.parse(localStorage.getItem('adminData'));
     try {
-      const response = await fetch(`http://localhost:5000/api/users/mentor/${user.fullname}`); // Replace with your API endpoint
+      const response = await fetch(`https://cms-production-0677.up.railway.app/api/users/mentor/${user.fullname}`); // Replace with your API endpoint
       if (!response.ok) {
         throw new Error('Failed to fetch mentees');
       }
