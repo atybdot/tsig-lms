@@ -31,7 +31,7 @@ export function useAttendance({ mentee }) {
   const markAttendance = async (newStatus) => {
     const newDate = new Date();
     try {
-        const response = await fetch(`http://localhost:5000/api/users/attendance/${mentee.id}`, {
+        const response = await fetch(`https://cms-production-0677.up.railway.app/api/users/attendance/${mentee.id}`, {
             method: 'PATCH'
         });
         const data = await response.json();
