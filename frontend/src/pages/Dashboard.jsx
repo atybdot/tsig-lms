@@ -30,7 +30,7 @@ const Dashboard = () => {
   const fetchUserTasks = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`https://cms-38xq.onrender.com/api/tasks/user/${userId}`);
+      const response = await fetch(`https://railway-production-dc61.up.railway.app/api/tasks/user/${userId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch tasks');
       }
@@ -77,7 +77,7 @@ const Dashboard = () => {
         throw new Error('User data not found');
       }
 
-      const response = await fetch(`https://cms-38xq.onrender.com/api/tasks/submit`, {
+      const response = await fetch(`https://railway-production-dc61.up.railway.app/api/tasks/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
