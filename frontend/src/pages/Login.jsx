@@ -27,6 +27,7 @@ const Login = () => {
 
       if (response.ok) {
         localStorage.setItem('userData', JSON.stringify(data.user));
+        console.log(data);
         navigate(`/dashboard/${data.user.id}`);
       } else {
         setError(data.message || 'Failed to login');
