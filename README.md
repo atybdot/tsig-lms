@@ -1,5 +1,5 @@
 # Content Managment System | TSIG
 
-- tracking progress
+- track progress of new members
 - dashboard
-- tasks
+- create and assign tasks
