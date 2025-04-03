@@ -8,6 +8,13 @@ const taskSchema = new mongoose.Schema({
   generated: { type: String },
   isGlobal: { type: Boolean, default: false },
   status: { type: Boolean, default: false }, // true for completed, false for incomplete, null for not started
+  submission: {
+    fileId: mongoose.Schema.Types.ObjectId,
+    fileName: String,
+    fileType: String,
+    submittedBy: String,
+    submittedAt: Date
+  }
 }, { timestamps: true });
 
 export default mongoose.model('Task', taskSchema);

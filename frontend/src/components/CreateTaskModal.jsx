@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const CreateTaskModal = ({ isOpen, onClose }) => {
+const CreateTaskModal = ({ isOpen, onClose, users }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [userId, setUserId] = useState('');
@@ -14,7 +14,7 @@ const CreateTaskModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
+    console.log(userId)
     try {
       const response = await fetch('https://cms-production-0677.up.railway.app/api/tasks/', {
         method: 'POST',
@@ -66,13 +66,19 @@ const CreateTaskModal = ({ isOpen, onClose }) => {
           </div>
           <div>
             <label className="block text-sm font-medium">User ID</label>
-            <input
-              type="text"
+            <select
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-2"
               required
-            />
+            >
+              <option value="" disabled>Select User</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.id} : {user.fullname}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="flex items-center">

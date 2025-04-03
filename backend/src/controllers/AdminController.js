@@ -14,6 +14,16 @@ const AdminController = {
     }
   },
 
+  createMany: async (req, res) => {
+    try {
+      const admins = req.body;
+      const success = await Admin.insertMany(admins);
+      res.status(200).json({ 'message': success });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
   signin: async (req, res) => {
     try {
       const { username, password } = req.body;

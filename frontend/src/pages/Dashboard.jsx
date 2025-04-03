@@ -30,7 +30,7 @@ const Dashboard = () => {
   const fetchUserTasks = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`https://railway-production-dc61.up.railway.app/api/tasks/user/${userId}`);
+      const response = await fetch(`http://localhost:5000/api/tasks/user/${userId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch tasks');
       }
@@ -70,31 +70,38 @@ const Dashboard = () => {
     setIsModalOpen(true);
   };
 
-  const handleTaskSubmit = async (taskId) => {
+  const handleTaskSubmit = async (taskId, file) => {
     try {
-      const userData = JSON.parse(localStorage.getItem('userData'));
       if (!userData || !userData._id) {
         throw new Error('User data not found');
       }
-
-      const response = await fetch(`https://railway-production-dc61.up.railway.app/api/tasks/submit`, {
+  
+      // Create multipart FormData
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('userId', userData._id);
+      formData.append('taskId', taskId);
+  
+      // Debug: log each FormData pair
+      for (let pair of formData.entries()) {
+        console.log('FormData:', pair[0], pair[1]);
+      }
+  
+      const response = await fetch('http://localhost:5000/api/tasks/submit', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: userData.id,
-          taskId
-        })
+        body: formData,
+        // No "Content-Type" header; browser sets it for multipart/form-data
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
+        console.log('Error submitting task:', errorData);
         throw new Error(errorData.message || 'Failed to submit task');
       }
-
-      // Refresh tasks after successful submission
+      const data = await response.json();
       await fetchUserTasks();
+      console.log('Task submitted:', data);
+      return data;
     } catch (error) {
       console.error('Error submitting task:', error);
       throw error;
@@ -196,11 +203,12 @@ const Dashboard = () => {
             setIsModalOpen(false);
             setSelectedTask(null);
           }}
-          onSubmit={handleTaskSubmit}
+          handleTaskSubmit={handleTaskSubmit}
+          user={userData}
         />
       </div>
     </div>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

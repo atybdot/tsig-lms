@@ -10,8 +10,9 @@ router.post('/', UserController.create);
 // Create Multiple Users
 router.post('/many', UserController.createMany);
 
-router.patch('/attendance/:menteeId', UserController.incrementAttendance);
+router.patch('/decattendance/:menteeId', UserController.decrementAttendance);
 
+router.patch('/inrattendance/:menteeId', UserController.incrementAttendance);
 // Get all users
 router.get('/', UserController.getAll);
 

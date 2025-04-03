@@ -31,13 +31,26 @@ export function useAttendance({ mentee }) {
   const markAttendance = async (newStatus) => {
     const newDate = new Date();
     try {
-        const response = await fetch(`https://cms-production-0677.up.railway.app/api/users/attendance/${mentee.id}`, {
+        if (newStatus === 'present') {
+          const response = await fetch(`https://railway-production-dc61.up.railway.app/api/users/inrattendance/${mentee.id}`, {
             method: 'PATCH'
-        });
-        const data = await response.json();
-        console.log(data);
-        if (!response.ok) {
-            throw new Error('Attendance error: Try again later');
+          });
+          const data = await response.json();
+          console.log(data);
+          if (!response.ok) {
+              throw new Error('Attendance error: Try again later');
+          }
+          console.log('attendance marked: ', data.mentee.attendance);
+        } else {
+          const response = await fetch(`https://railway-production-dc61.up.railway.app/api/users/decattendance/${mentee.id}`, {
+            method: 'PATCH'
+          });
+          const data = await response.json();
+          console.log(data);
+          if (!response.ok) {
+              throw new Error('Attendance error: Try again later');
+          }
+          console.log('attendance marked: ', data.mentee.attendance);
         }
         setLastMarked(newDate);
         setStatus(newStatus);

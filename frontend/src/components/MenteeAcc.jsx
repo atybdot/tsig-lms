@@ -42,7 +42,7 @@ const MenteeAcc = ({ mentee, index }) => {
         <div className="bg-gray-50 border-t">
           {mentee.taskAssign && mentee.taskAssign.length > 0 ? (
             mentee.taskAssign.map((task) => (
-              <TaskItem key={task.id} task={task} />
+              <TaskItem key={task.id} task={task} mentee={mentee} />
             ))
           ) : (
             <div>No tasks assigned.</div>

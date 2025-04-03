@@ -1,6 +1,6 @@
 import { TaskStatus } from './TaskStatus';
 
-const TaskItem = ({ task }) => {
+const TaskItem = ({ task , mentee }) => {
     const date = new Date(task.time);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
@@ -19,6 +19,13 @@ const TaskItem = ({ task }) => {
           <TaskStatus completed={task.status} submissionDate={formattedDate} />
         </div>
       </div>
+      <span>
+        {task.submission && mentee._id === task.submission.submittedBy ? (
+          <img src={`http://localhost:5000/api/tasks/files/${task.submission.fileId}`} alt="" />
+        ) : (
+          <span className="text-gray-500">No submission</span>
+        )}
+      </span>
     </div>
   );
 }

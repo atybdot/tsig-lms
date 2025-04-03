@@ -6,6 +6,7 @@ const router = express.Router();
 // Admin CRUD routes
 router.post('/', AdminController.create);
 router.post('/signin', AdminController.signin);
+router.post('/many', AdminController.createMany);
 router.get('/', AdminController.getAll);
 router.get('/:id', AdminController.getById);
 router.put('/:id', AdminController.update);

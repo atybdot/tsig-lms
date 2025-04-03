@@ -12,7 +12,7 @@ const AdminLogin = () => {
     setError("");
 
     try {
-      const response = await fetch("https://cms-production-0677.up.railway.app/api/admin/signin", {
+      const response = await fetch("http://localhost:5000/api/admin/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,7 +28,7 @@ const AdminLogin = () => {
       if (response.ok) {
         localStorage.setItem("adminData", JSON.stringify(data));
         console.log(data.id);
-        navigate(`/admin/${data.id}`);
+        navigate(`/admin/${data.fullname}`);
       } else {
         setError(data.message || "Failed to login");
       }

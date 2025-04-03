@@ -7,21 +7,36 @@ const AdminDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const user = JSON.parse(localStorage.getItem('adminData'));
   
   // Fetch mentee data
   const fetchMentees = async () => {
-    const user = JSON.parse(localStorage.getItem('adminData'));
+    setLoading(true);
     try {
-      const response = await fetch(`https://cms-production-0677.up.railway.app/api/users/mentor/${user.fullname}`); // Replace with your API endpoint
+      const response = await fetch(`http://localhost:5000/api/users/mentor/${user.fullname}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
+
       if (!response.ok) {
-        throw new Error('Failed to fetch mentees');
+        const errorText = await response.text();
+        console.error('Response:', errorText);
+        throw new Error(`Server error: ${response.status}`);
       }
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned non-JSON response');
+      }
+
       const data = await response.json();
-      console.log(data);
       setMentees(data);
     } catch (err) {
       console.error('Error fetching mentees:', err);
-      setError(err.message);
+      setError(err.message || 'Failed to fetch mentees');
     } finally {
       setLoading(false);
     }
@@ -65,9 +80,9 @@ const AdminDashboard = () => {
       />
 
       {/* Create Task Modal */}
-      <CreateTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <CreateTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} users={mentees} />
     </div>
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;

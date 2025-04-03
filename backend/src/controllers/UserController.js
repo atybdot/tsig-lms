@@ -142,13 +142,32 @@ const UserController = {
         return res.status(404).json({ message: 'Mentee not found' });
       }
   
-      mentee.attendance = (mentee.attendance || 0) + 1; // Increment attendance
+      mentee.attendance = mentee.attendance + 1; // Increment attendance
       await mentee.save(); // Save the updated mentee
   
       res.status(200).json({ message: 'Attendance incremented successfully', mentee });
     } catch (error) {
       console.error('Error incrementing attendance:', error);
       res.status(500).json({ message: 'Error incrementing attendance' });
+    }
+  },
+
+  decrementAttendance: async (req, res) => {
+    const { menteeId } = req.params; // Expecting menteeId in the request body
+  
+    try {
+      const mentee = await User.findOne({ id: menteeId });
+      if (!mentee) {
+        return res.status(404).json({ message: 'Mentee not found' });
+      }
+  
+      mentee.attendance = mentee.attendance <= 0 ? 0 : mentee.attendance - 1; // Increment attendance
+      await mentee.save(); // Save the updated mentee
+  
+      res.status(200).json({ message: 'Attendance decrementing successfully', mentee });
+    } catch (error) {
+      console.error('Error decrementing attendance:', error);
+      res.status(500).json({ message: 'Error decrementing attendance' });
     }
   },
 

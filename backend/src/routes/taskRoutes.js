@@ -27,4 +27,10 @@ router.delete('/:id', TaskController.delete);
 // Submit task
 router.post('/submit', TaskController.submitTask);
 
-export default router; 
+// Add to your routes file
+router.get('/tasks/:taskId/submission', TaskController.getSubmissionFile);
+
+// Get file by ID
+router.get('/files/:fileId', TaskController.getFileById);
+
+export default router;

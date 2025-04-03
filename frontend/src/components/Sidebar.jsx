@@ -9,9 +9,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem('userData');
     if (storedUser) {
-      setUserData(JSON.parse(storedUser));
+      const user = JSON.parse(storedUser);
+      setUserData(user);
     } else {
-      setUserData(JSON.parse(localStorage.getItem('adminData')));
+      const admin = JSON.parse(localStorage.getItem('adminData'));
+      setUserData(admin);
     }
   }, []);
 
@@ -29,19 +31,19 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   const menuItems = [
     { 
-      path: `/dashboard/${userData?.id}`, 
+      path: location.pathname.includes('/dashboard') ? `/dashboard/${userData?.id}` : `/admin/${userData?.fullname}`,
       label: 'Dashboard',
-      isActive: location.pathname === `/dashboard/${userData?.id}`
+      isActive: location.pathname === `/dashboard/${userData?.id}` || location.pathname === `/admin/${userData?.fullname}`
     },
     { 
-      path: '/dashboard/tasks', 
+      path: location.pathname.includes('/dashboard') ? `/dashboard/tasks` : `/admin/tasks`, 
       label: 'Tasks',
-      isActive: location.pathname === '/dashboard/tasks'
+      isActive: location.pathname === '/dashboard/tasks' || location.pathname === '/admin/tasks'
     },
     { 
-      path: '/dashboard/users', 
+      path: location.pathname.includes('/dashboard') ? `/dashboard/users` : `/admin/users`, 
       label: 'Users',
-      isActive: location.pathname === '/dashboard/users'
+      isActive: location.pathname === '/dashboard/users' || location.pathname === '/admin/users'
     },
   ];
 
@@ -84,7 +86,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <div className="absolute bottom-0 w-full border-t p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="h-8 w-8 rounded-full bg-gray-200"></div>
+              <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <span className="text-xs text-gray-600">
+                  {userData?.fullname?.charAt(0)?.toUpperCase() || '?'}
+                </span>
+              </div>
             <div>
               <p className="text-sm font-medium">
                 {userData?.fullname || 'Guest'}
@@ -103,4 +109,4 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   );
 };
 
-export default Sidebar; 
+export default Sidebar;

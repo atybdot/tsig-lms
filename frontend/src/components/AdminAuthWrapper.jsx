@@ -6,7 +6,7 @@ const AdminAuthWrapper = ({ children, path = '/dashboard', notUser = true }) => 
         if (!user) return <Navigate to="/admin/login" replace />;
     // if (path === '/') return <Navigate to={`/dashboard/${user.id}`} replace />;
     } else {
-        if (user) return <Navigate to={`/admin/${user.id}`} replace />;
+        if (user) return <Navigate to={`/admin/${user.fullname}`} replace />;
     // if (path === '/') return <Navigate to="/" replace />;
     }
     return children;
