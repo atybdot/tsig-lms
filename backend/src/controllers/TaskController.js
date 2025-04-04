@@ -150,7 +150,15 @@ const TaskController = {
             .on('error', reject)
             .on('finish', resolve);
         });
-        
+
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+        user.taskDone.push(taskId); 
+        user.taskAssign = user.taskAssign.filter(taskId => taskId !== taskId); // Remove from assigned tasks
+        await user.save(); // Save the user with the updated taskDone array
+
         // Store the file reference in the task
         task.submission = {
           fileId: uploadStream.id, // Store GridFS file ID
@@ -159,7 +167,7 @@ const TaskController = {
           submittedBy: userId,
           submittedAt: new Date()
         };
-        
+        task.status = true; // Mark task as completed
         // Save the updated task
         await task.save();
         

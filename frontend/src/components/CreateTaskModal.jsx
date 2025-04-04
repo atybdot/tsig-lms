@@ -16,7 +16,7 @@ const CreateTaskModal = ({ isOpen, onClose, users }) => {
     setLoading(true);
     console.log(userId)
     try {
-      const response = await fetch('https://cms-production-0677.up.railway.app/api/tasks/', {
+      const response = await fetch(`${import.meta.env.VITE_BACK_URL}api/tasks/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

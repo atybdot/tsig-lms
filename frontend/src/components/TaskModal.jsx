@@ -58,7 +58,7 @@ const TaskModal = ({ task, onClose, handleTaskSubmit, isOpen, user }) => {
 
         { task.submission && task.submission.submittedBy === user._id ? (
           <img 
-            src={`http://localhost:5000/api/tasks/files/${task.submission.fileId}`}
+            src={`https://tsiglms-production.up.railway.app/api/tasks/files/${task.submission.fileId}`}
             alt=''
           />
         ) : (

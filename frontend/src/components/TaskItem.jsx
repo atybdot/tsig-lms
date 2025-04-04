@@ -21,7 +21,7 @@ const TaskItem = ({ task , mentee }) => {
       </div>
       <span>
         {task.submission && mentee._id === task.submission.submittedBy ? (
-          <img src={`http://localhost:5000/api/tasks/files/${task.submission.fileId}`} alt="" />
+          <img src={`https://tsiglms-production.up.railway.app/api/tasks/files/${task.submission.fileId}`} alt="" />
         ) : (
           <span className="text-gray-500">No submission</span>
         )}

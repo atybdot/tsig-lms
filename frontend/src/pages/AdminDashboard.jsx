@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import CreateTaskModal from '../components/CreateTaskModal';
 import MenteeAccordion from '../components/MenteeAccordion';
+import React from 'react';
 
 const AdminDashboard = () => {
   const [mentees, setMentees] = useState([]);
@@ -13,7 +14,7 @@ const AdminDashboard = () => {
   const fetchMentees = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/users/mentor/${user.fullname}`, {
+      const response = await fetch(`${import.meta.env.VITE_BACK_URL}api/users/mentor/${user.fullname}`, {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',

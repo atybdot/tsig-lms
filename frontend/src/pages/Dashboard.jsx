@@ -30,7 +30,7 @@ const Dashboard = () => {
   const fetchUserTasks = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/tasks/user/${userId}`);
+      const response = await fetch(`https://tsiglms-production.up.railway.app/api/tasks/user/${userId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch tasks');
       }
@@ -87,7 +87,7 @@ const Dashboard = () => {
         console.log('FormData:', pair[0], pair[1]);
       }
   
-      const response = await fetch('http://localhost:5000/api/tasks/submit', {
+      const response = await fetch('https://tsiglms-production.up.railway.app/api/tasks/submit', {
         method: 'POST',
         body: formData,
         // No "Content-Type" header; browser sets it for multipart/form-data
