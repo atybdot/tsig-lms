@@ -103,6 +103,20 @@ const TaskController = {
     }
   },
 
+  // deleteAll: async (req, res) => {
+  //   try {
+  //     // Optional: Add authentication/authorization check here
+  //     const result = await Task.deleteMany({});
+  //     res.json({ 
+  //       message: 'All tasks deleted successfully', 
+  //       deletedCount: result.deletedCount 
+  //     });
+  //   } catch (error) {
+  //     console.error('Error deleting tasks:', error);
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // },
+
   // Submit task
   submitTask: async (req, res) => {
     upload(req, res, async (err) => {

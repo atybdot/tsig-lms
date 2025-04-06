@@ -81,7 +81,7 @@ const CreateTaskModal = ({ isOpen, onClose, users }) => {
             </select>
           </div>
           <div>
-            <label className="flex items-center">
+            {/* <label className="flex items-center">
               <input
                 type="checkbox"
                 checked={isGlobal}
@@ -89,7 +89,7 @@ const CreateTaskModal = ({ isOpen, onClose, users }) => {
                 className="mr-2"
               />
               Is Global
-            </label>
+            </label> */}
           </div>
           <div className="flex justify-end space-x-2">
             <button

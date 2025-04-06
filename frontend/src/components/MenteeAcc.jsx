@@ -40,8 +40,8 @@ const MenteeAcc = ({ mentee, index }) => {
       </button>
       {openIndex === index && (
         <div className="bg-gray-50 border-t">
-          {mentee.taskDone && mentee.taskDone.length > 0 ? (
-            mentee.taskDone.map((task) => (
+          {mentee.taskAssign && mentee.taskAssign.length > 0 ? (
+            mentee.taskAssign.map((task) => (
               <TaskItem key={task.id} task={task} mentee={mentee} />
             ))
           ) : (

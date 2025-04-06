@@ -21,8 +21,10 @@ router.get('/:id', TaskController.getById);
 // Update task
 router.put('/:id', TaskController.update);
 
+// router.delete('/delete', TaskController.deleteAll);
 // Delete task
 router.delete('/:id', TaskController.delete);
+
 
 // Submit task
 router.post('/submit', TaskController.submitTask);
