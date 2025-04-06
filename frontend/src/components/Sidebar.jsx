@@ -5,46 +5,49 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [userData, setUserData] = useState(null);
-
+  const [isAdmin, setIsAdmin] = useState(false);
+  
   useEffect(() => {
-    const storedUser = localStorage.getItem('userData');
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setUserData(user);
-    } else {
-      const admin = JSON.parse(localStorage.getItem('adminData'));
-      setUserData(admin);
+    // Check if user or admin is logged in
+    const user = localStorage.getItem('userData');
+    const admin = localStorage.getItem('adminData');
+    
+    if (user) {
+      setUserData(JSON.parse(user));
+      setIsAdmin(false);
+    } else if (admin) {
+      setUserData(JSON.parse(admin));
+      setIsAdmin(true);
     }
   }, []);
 
   const handleLogout = () => {
-    const storedUser = localStorage.getItem('userData');
-    if (storedUser) {
+    if (isAdmin) {
+      localStorage.removeItem('adminData');
+      navigate('/admin/login');
+    } else {
       localStorage.removeItem('userData');
       navigate('/');
-    } else {
-      localStorage.removeItem('adminData');
-      navigate('/admin');
     }
     setUserData(null);
   };
 
   const menuItems = [
     { 
-      path: location.pathname.includes('/dashboard') ? `/dashboard/${userData?.id}` : `/admin/${userData?.fullname}`,
+      path: isAdmin ? `/admin/${userData?.fullname}` : `/dashboard/${userData?.id}`,
       label: 'Dashboard',
       isActive: location.pathname === `/dashboard/${userData?.id}` || location.pathname === `/admin/${userData?.fullname}`
     },
-    { 
-      path: location.pathname.includes('/dashboard') ? `/dashboard/tasks` : `/admin/tasks`, 
-      label: 'Tasks',
-      isActive: location.pathname === '/dashboard/tasks' || location.pathname === '/admin/tasks'
-    },
-    { 
-      path: location.pathname.includes('/dashboard') ? `/dashboard/users` : `/admin/users`, 
-      label: 'Users',
-      isActive: location.pathname === '/dashboard/users' || location.pathname === '/admin/users'
-    },
+    // { 
+    //   path: isAdmin ? `/admin/tasks` : `/dashboard/tasks`, 
+    //   label: 'Tasks',
+    //   isActive: location.pathname === '/dashboard/tasks' || location.pathname === '/admin/tasks'
+    // },
+    // { 
+    //   path: isAdmin ? `/admin/users` : `/dashboard/users`, 
+    //   label: 'Users',
+    //   isActive: location.pathname === '/dashboard/users' || location.pathname === '/admin/users'
+    // },
   ];
 
   return (

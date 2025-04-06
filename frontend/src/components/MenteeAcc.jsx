@@ -40,12 +40,19 @@ const MenteeAcc = ({ mentee, index }) => {
       </button>
       {openIndex === index && (
         <div className="bg-gray-50 border-t">
-          {mentee.taskAssign && mentee.taskAssign.length > 0 ? (
-            mentee.taskAssign.map((task) => (
+          {mentee.taskDone && mentee.taskDone.length > 0 ? (
+            mentee.taskDone.map((task) => (
               <TaskItem key={task.id} task={task} mentee={mentee} />
             ))
           ) : (
             <div>No tasks assigned.</div>
+          )}
+          {mentee.taskDone && mentee.taskDone.length > 0 ? (
+            mentee.taskDone.map((task) => (
+              <TaskItem key={task.id} task={task} mentee={mentee} />
+            ))
+          ) : (
+            <div>No tasks completed.</div>
           )}
           <AttendanceButton mentee={mentee} />
         </div>

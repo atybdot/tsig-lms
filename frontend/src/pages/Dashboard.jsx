@@ -35,7 +35,7 @@ const Dashboard = () => {
         throw new Error('Failed to fetch tasks');
       }
       const data = await response.json();
-
+      console.log("data : ", data);
       if (data.success) {
         console.log("data", data.success);
       }

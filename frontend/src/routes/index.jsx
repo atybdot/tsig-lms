@@ -4,26 +4,78 @@ import Dashboard from '../pages/Dashboard';
 import Login from '../pages/Login';
 import AdminDashboard from '../pages/AdminDashboard';
 import AdminLogin from '../pages/AdminLogin';
-import AdminAuthWrapper from '../components/AdminAuthWrapper';
+
+// Helper functions to work with different storage keys
+const auth = {
+  getUser: () => {
+    return JSON.parse(localStorage.getItem('userData')) || null;
+  },
+  getAdmin: () => {
+    return JSON.parse(localStorage.getItem('adminData')) || null;
+  },
+  isUserLoggedIn: () => {
+    return localStorage.getItem('userData') !== null;
+  },
+  isAdminLoggedIn: () => {
+    return localStorage.getItem('adminData') !== null;
+  },
+  logout: (type) => {
+    if (type === 'user' || type === 'all') localStorage.removeItem('userData');
+    if (type === 'admin' || type === 'all') localStorage.removeItem('adminData');
+  }
+};
+
+// User auth component
+const RequireUserAuth = ({ children, redirectTo = '/' }) => {
+  if (!auth.isUserLoggedIn()) {
+    return <Navigate to={redirectTo} replace />;
+  }
+  return children;
+};
+
+// Admin auth component
+const RequireAdminAuth = ({ children, redirectTo = '/admin/login' }) => {
+  if (!auth.isAdminLoggedIn()) {
+    return <Navigate to={redirectTo} replace />;
+  }
+  return children;
+};
+
+// Redirect if user logged in
+const RedirectIfUserLoggedIn = ({ children, redirectTo = '/dashboard' }) => {
+  const user = auth.getUser();
+  if (user) {
+    return <Navigate to={`${redirectTo}/${user.id}`} replace />;
+  }
+  return children;
+};
+
+// Redirect if admin logged in
+const RedirectIfAdminLoggedIn = ({ children, redirectTo = '/admin' }) => {
+  const admin = auth.getAdmin();
+  if (admin) {
+    return <Navigate to={`${redirectTo}/${admin.fullname}`} replace />;
+  }
+  return children;
+};
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <AuthWrapper notUser={false}><Login /></AuthWrapper>,
+    element: <RedirectIfUserLoggedIn><Login /></RedirectIfUserLoggedIn>,
   },
   {
     path: '/dashboard',
-    element: <AuthWrapper><DashboardLayout /></AuthWrapper>,
+    element: <RequireUserAuth><DashboardLayout /></RequireUserAuth>,
     children: [
       {
         path: ':userId',
-        element: <AuthWrapper><Dashboard /></AuthWrapper>,
+        element: <RequireUserAuth><Dashboard /></RequireUserAuth>,
       },
     ],
   },
   {
     path: '/admin',
-    // element: <AdminAuthWrapper><DashboardLayout /></AdminAuthWrapper>,
     children: [
       {
         index: true,
@@ -31,11 +83,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'login',
-        element: <AdminAuthWrapper notUser={false}><AdminLogin /></AdminAuthWrapper>
+        element: <RedirectIfAdminLoggedIn><AdminLogin /></RedirectIfAdminLoggedIn>
       },
       {
         path: ':adminId',
-        element: <AdminAuthWrapper><DashboardLayout /></AdminAuthWrapper>,
+        element: <RequireAdminAuth><DashboardLayout /></RequireAdminAuth>,
         children: [
           {
             path: '',
@@ -50,17 +102,5 @@ const router = createBrowserRouter([
     element: <Navigate to="/" replace />,
   },
 ]);
-
-function AuthWrapper({ children, path = '/dashboard', notUser = true }) {
-  const user = JSON.parse(localStorage.getItem('userData'));
-  if (notUser) {
-    if (!user) return <Navigate to="/" replace />;
-    // if (path === '/') return <Navigate to={`/dashboard/${user.id}`} replace />;
-  } else {
-    if (user) return <Navigate to={`/dashboard/${user.id}`} replace />;
-    // if (path === '/') return <Navigate to="/" replace />;
-  }
-  return children;
-}
 
 export default router;

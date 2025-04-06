@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import CreateTaskModal from '../components/CreateTaskModal';
 import MenteeAccordion from '../components/MenteeAccordion';
-import React from 'react';
 
 const AdminDashboard = () => {
   const [mentees, setMentees] = useState([]);

@@ -32,7 +32,7 @@ export function useAttendance({ mentee }) {
     const newDate = new Date();
     try {
         if (newStatus === 'present') {
-          const response = await fetch(`https://railway-production-dc61.up.railway.app/api/users/inrattendance/${mentee.id}`, {
+          const response = await fetch(`${import.meta.env.VITE_BACK_URL}api/users/inrattendance/${mentee.id}`, {
             method: 'PATCH'
           });
           const data = await response.json();
@@ -42,7 +42,7 @@ export function useAttendance({ mentee }) {
           }
           console.log('attendance marked: ', data.mentee.attendance);
         } else {
-          const response = await fetch(`https://railway-production-dc61.up.railway.app/api/users/decattendance/${mentee.id}`, {
+          const response = await fetch(`${import.meta.env.VITE_BACK_URL}api/users/decattendance/${mentee.id}`, {
             method: 'PATCH'
           });
           const data = await response.json();

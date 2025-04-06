@@ -14,26 +14,22 @@ const AdminLogin = () => {
     try {
       const response = await fetch("https://tsiglms-production.up.railway.app/api/admin/signin", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
       });
+      
       const data = await response.json();
-      console.log(username, password);
 
       if (response.ok) {
+        // Clear any existing user session
+        localStorage.removeItem('userData');
+        // Store admin data
         localStorage.setItem("adminData", JSON.stringify(data));
-        console.log(data.id);
         navigate(`/admin/${data.fullname}`);
       } else {
         setError(data.message || "Failed to login");
       }
     } catch (err) {
-      console.error("Login error:", err);
       setError("Network error or server not responding. Please try again.");
     }
   };
