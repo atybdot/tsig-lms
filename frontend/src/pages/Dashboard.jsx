@@ -16,10 +16,9 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  
   // Get user data from localStorage
   useEffect(() => {
-    
     const storedUser = localStorage.getItem('userData');
     if (storedUser) {
       setUserData(JSON.parse(storedUser));
@@ -30,20 +29,16 @@ const Dashboard = () => {
   const fetchUserTasks = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`https://tsiglms-production.up.railway.app/api/tasks/user/${userId}`);
+      const response = await fetch(`${import.meta.env.VITE_BACK_URL}api/tasks/user/${userId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch tasks');
       }
       const data = await response.json();
-      console.log("data : ", data);
-      if (data.success) {
-        console.log("data", data.success);
-      }
       
       // Calculate stats
       const totalTasks = data.length;
-      const pendingTasks = data.filter(task => task.status === null || task.status === false).length;
-      const completedTasks = data.filter(task => task.status === true).length;
+      const pendingTasks = data.filter(task => task.status === null || task.status === "false").length;
+      const completedTasks = data.filter(task => task.status === "true").length;
       
       setTasks(data);
       setStats({
@@ -70,7 +65,7 @@ const Dashboard = () => {
     setIsModalOpen(true);
   };
 
-  const handleTaskSubmit = async (taskId, file) => {
+  const handleTaskSubmit = async (taskId, file, link) => {
     try {
       if (!userData || !userData._id) {
         throw new Error('User data not found');
@@ -81,13 +76,16 @@ const Dashboard = () => {
       formData.append('file', file);
       formData.append('userId', userData._id);
       formData.append('taskId', taskId);
-  
+      if (link) {
+        formData.append('Links', link);
+      }
+      
       // Debug: log each FormData pair
       for (let pair of formData.entries()) {
         console.log('FormData:', pair[0], pair[1]);
       }
   
-      const response = await fetch('https://tsiglms-production.up.railway.app/api/tasks/submit', {
+      const response = await fetch(`${import.meta.env.VITE_BACK_URL}api/tasks/submit`, {
         method: 'POST',
         body: formData,
         // No "Content-Type" header; browser sets it for multipart/form-data
@@ -106,6 +104,48 @@ const Dashboard = () => {
       console.error('Error submitting task:', error);
       throw error;
     }
+  };
+
+  const getFileIcon = (fileType) => {
+    if (!fileType) return null;
+    
+    if (fileType.startsWith('image/')) {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      );
+    } else if (fileType.includes('pdf')) {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      );
+    } else if (fileType.includes('spreadsheet') || fileType.includes('excel') || fileType.includes('csv')) {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+      );
+    } else if (fileType.includes('word') || fileType.includes('document')) {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      );
+    }
+    
+    // Default document icon
+    return (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      </svg>
+    );
+  };
+
+  // Handle calendar event click
+  const handleAttendanceClick = (event) => {
+    alert(`${!event.title} on ${moment(event.start).format('MMMM D, YYYY')}`);
   };
 
   // Redirect if no userId
@@ -130,9 +170,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="flex sm:w-full sm:z-0">
-      {/* <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} /> */}
-      
+    <div className="flex flex-col sm:w-full sm:z-0">
       <div className="flex-1 p-4">
         {/* Hamburger Icon */}
         <button onClick={setIsSidebarOpen} className="md:hidden p-2 text-gray-600">
@@ -171,20 +209,32 @@ const Dashboard = () => {
                 onClick={() => handleTaskClick(task)}
                 className="flex cursor-pointer items-center justify-between rounded-lg border p-4 hover:bg-gray-50"
               >
-                <div>
-                  <p className="font-medium">{task.title}</p>
-                  <p className="text-sm text-gray-500">{task.description}</p>
+                <div className="flex items-center">
+                  {task.submission && task.submission.fileId && (
+                    <div className="mr-3">
+                      {getFileIcon(task.submission.fileType)}
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-medium">{task.title}</p>
+                    <p className="text-sm text-gray-500">{task.description}</p>
+                    {task.submission && (
+                      <p className="text-xs text-blue-500 mt-1">
+                        {task.submission.fileName ? `Submitted: ${task.submission.fileName}` : 'File submitted'}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <span 
                   className={`rounded-full px-2 py-1 text-xs ${
-                    task.status === true 
+                    task.status === "true" 
                       ? 'bg-green-100 text-green-800' 
                       : 'bg-yellow-100 text-yellow-800'
                   }`}
                 >
-                  {task.status === true 
+                  {task.status === "true" 
                     ? 'Completed' 
-                    : task.status === false 
+                    : task.status === "false" 
                     ? 'Incomplete' 
                     : 'Pending'}
                 </span>

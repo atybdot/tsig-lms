@@ -12,7 +12,7 @@ const AdminLogin = () => {
     setError("");
 
     try {
-      const response = await fetch("https://tsiglms-production.up.railway.app/api/admin/signin", {
+      const response = await fetch(`${import.meta.env.VITE_BACK_URL}api/admin/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),

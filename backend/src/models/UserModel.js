@@ -9,9 +9,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  attendance: {
-    type: Number
-  },
+  // attendance: {
+  //   type: Map,
+  //   of: Number,
+  //   default: {}  // Default empty map when user is created
+  // },
   taskDone: {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
     default: []  // Default empty array when user is created

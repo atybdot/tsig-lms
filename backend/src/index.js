@@ -3,12 +3,14 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import routes from './routes/index.js';
+import cron from 'node-cron';
+import { initScheduler } from './utils/scheduler.js';
 
 // Load environment variables first
 dotenv.config();
 
 export const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
@@ -53,6 +55,10 @@ const connectDB = async () => {
       socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
     });
     console.log('MongoDB connected successfully');
+    
+    // Initialize scheduler after database connection is established
+    initScheduler();
+    
     return true;
   } catch (error) {
     console.error('MongoDB connection error:', error);

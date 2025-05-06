@@ -12,6 +12,8 @@ router.post('/many', UserController.createMany);
 
 router.patch('/decattendance/:menteeId', UserController.decrementAttendance);
 
+router.get('/attendance/:menteeId', UserController.getAttendance);
+
 router.patch('/inrattendance/:menteeId', UserController.incrementAttendance);
 // Get all users
 router.get('/', UserController.getAll);

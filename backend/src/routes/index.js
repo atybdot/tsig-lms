@@ -12,4 +12,4 @@ router.use('/users', userRoutes);
 router.use('/tasks', taskRoutes);
 router.use('/completed-tasks', completedTaskRoutes);
 
-export default router; 
+export default router;

@@ -14,7 +14,7 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const response = await fetch('https://tsiglms-production.up.railway.app/api/users/signin', {
+      const response = await fetch(`${import.meta.env.VITE_BACK_URL}api/users/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fullname: fullname.trim(), password })

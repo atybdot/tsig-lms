@@ -21,7 +21,7 @@ router.get('/:id', TaskController.getById);
 // Update task
 router.put('/:id', TaskController.update);
 
-// router.delete('/delete', TaskController.deleteAll);
+router.delete('/delete', TaskController.deleteAll);
 // Delete task
 router.delete('/:id', TaskController.delete);
 
@@ -34,5 +34,8 @@ router.get('/tasks/:taskId/submission', TaskController.getSubmissionFile);
 
 // Get file by ID
 router.get('/files/:fileId', TaskController.getFileById);
+
+// Add this route with your other task routes
+router.delete('/files/all', TaskController.deleteAllFiles);
 
 export default router;

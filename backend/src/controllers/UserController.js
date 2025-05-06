@@ -85,6 +85,7 @@ const UserController = {
   // Get user by ID
   getById: async (req, res) => {
     try {
+      console.log(req);
       const user = await User.findOne({ id: req.params.id })
         .populate('taskDone')
         .populate('taskAssign');
@@ -142,7 +143,7 @@ const UserController = {
         return res.status(404).json({ message: 'Mentee not found' });
       }
   
-      mentee.attendance = mentee.attendance + 1; // Increment attendance
+      mentee.attendance.push() // Increment attendance
       await mentee.save(); // Save the updated mentee
   
       res.status(200).json({ message: 'Attendance incremented successfully', mentee });
@@ -175,7 +176,7 @@ const UserController = {
   getOneUser: async (req, res) => {
     try {
       const { fullname,password } = req.body;
-
+      
       if (!fullname || !password) {
         return res.status(400).json({ 
           success: false,
@@ -221,6 +222,21 @@ const UserController = {
       });
     }
   },
+  getAttendance: async (req, res) => {
+    const { menteeId } = req.params; // Expecting menteeId in the request body
+  
+    try {
+      const mentee = await User.findOne({ id: menteeId });
+      if (!mentee) {
+        return res.status(404).json({ message: 'Mentee not found' });
+      }
+  
+      res.status(200).json({ message: 'Attendance fetched successfully', attendance: mentee.attendance });
+    } catch (error) {
+      console.error('Error fetching attendance:', error);
+      res.status(500).json({ message: 'Error fetching attendance' });
+    }
+  }
 };
 
 export default UserController; 

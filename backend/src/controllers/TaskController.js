@@ -5,9 +5,11 @@ import mongoose from 'mongoose';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { Readable } from 'stream';
+import strivers from '../../public/problems_with_ids.json' assert { type: 'json' };
+import { create } from 'domain';
 
 // Set up GridFS
-let gfs;
+export let gfs; // Export the gfs variable
 const conn = mongoose.connection;
 conn.once('open', () => {
   gfs = new mongoose.mongo.GridFSBucket(conn.db, {
@@ -16,7 +18,13 @@ conn.once('open', () => {
   console.log('GridFS connection established');
 });
 
-const upload = multer().single('file');
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10 MB limit
+  },
+}).single('file');
 
 const TaskController = {
   // Create a new task
@@ -95,27 +103,72 @@ const TaskController = {
   // Delete task
   delete: async (req, res) => {
     try {
-      const task = await Task.findOneAndDelete({ id: req.params.id });
-      if (!task) return res.status(404).json({ message: 'Task not found' });
-      res.json({ message: 'Task deleted successfully' });
+      const { id } = req.params;
+      
+      // Find the task first to get user reference
+      const task = await Task.findById(id);
+      
+      if (!task) {
+        return res.status(404).json({ message: 'Task not found' });
+      }
+      
+      // Remove the task from user's taskAssign and taskDone arrays
+      try {
+        if (task.user_id) {
+          await User.updateOne(
+            { id: task.user_id },
+            {
+              $pull: {
+                taskAssign: task._id,
+                taskDone: task._id
+              }
+            }
+          );
+          console.log(`Removed task references from user ${task.user_id}`);
+        }
+      } catch (userError) {
+        console.error('Error updating user references:', userError);
+        // Continue with task deletion even if user update fails
+      }
+      
+      // Delete any associated submission file if exists
+      if (task.submission && task.submission.fileId) {
+        try {
+          const fileId = new mongoose.Types.ObjectId(task.submission.fileId);
+          await gfs.delete(fileId);
+          console.log(`Deleted submission file: ${fileId}`);
+        } catch (fileError) {
+          console.error('Error deleting submission file:', fileError);
+          // Continue with task deletion even if file deletion fails
+        }
+      }
+      
+      // Delete the task
+      await Task.findByIdAndDelete(id);
+      
+      res.json({ 
+        message: 'Task deleted successfully',
+        taskId: id
+      });
     } catch (error) {
+      console.error('Error deleting task:', error);
       res.status(500).json({ message: error.message });
     }
   },
 
-  // deleteAll: async (req, res) => {
-  //   try {
-  //     // Optional: Add authentication/authorization check here
-  //     const result = await Task.deleteMany({});
-  //     res.json({ 
-  //       message: 'All tasks deleted successfully', 
-  //       deletedCount: result.deletedCount 
-  //     });
-  //   } catch (error) {
-  //     console.error('Error deleting tasks:', error);
-  //     res.status(500).json({ message: error.message });
-  //   }
-  // },
+  deleteAll: async (req, res) => {
+    try {
+      // Optional: Add authentication/authorization check here
+      const result = await Task.deleteMany({});
+      res.json({ 
+        message: 'All tasks deleted successfully', 
+        deletedCount: result.deletedCount 
+      });
+    } catch (error) {
+      console.error('Error deleting tasks:', error);
+      res.status(500).json({ message: error.message });
+    }
+  },
 
   // Submit task
   submitTask: async (req, res) => {
@@ -128,7 +181,7 @@ const TaskController = {
         console.log('req.file:', req.file);
         console.log('req.body:', req.body);
 
-        const { userId, taskId } = req.body;
+        const { userId, taskId, Links, description } = req.body;
         
         if (!req.file) {
           return res.status(400).json({ message: "No file was uploaded" });
@@ -179,9 +232,10 @@ const TaskController = {
           fileName: req.file.originalname,
           fileType: req.file.mimetype,
           submittedBy: userId,
-          submittedAt: new Date()
+          submittedAt: new Date(),
+          Links: Links || null,
         };
-        task.status = true; // Mark task as completed
+        task.status = "pending"; // Mark task as completed
         // Save the updated task
         await task.save();
         
@@ -257,7 +311,66 @@ const TaskController = {
       console.error('Error retrieving file:', error);
       res.status(500).json({ message: error.message });
     }
+  },
+  // Add this function to your TaskController object
+deleteAllFiles: async (req, res) => {
+  try {
+    // Security checks - you might want to limit this to admin users only
+    // For example: if (!req.user.isAdmin) return res.status(403).json({ message: 'Unauthorized' });
+
+    // Check if GridFS is initialized
+    if (!gfs) {
+      return res.status(500).json({ message: 'GridFS not initialized' });
+    }
+
+    // Get all files to count them
+    const files = await gfs.find({}).toArray();
+    const fileCount = files.length;
+
+    if (fileCount === 0) {
+      return res.status(200).json({ 
+        message: 'No files to delete', 
+        deletedCount: 0 
+      });
+    }
+
+    // Create an array of promises for deletion
+    const deletionPromises = files.map(file => {
+      return new Promise((resolve, reject) => {
+        gfs.delete(file._id)
+          .then(() => resolve(file._id))
+          .catch(err => reject(err));
+      });
+    });
+
+    // Wait for all deletions to complete
+    const results = await Promise.allSettled(deletionPromises);
+    
+    // Count successful and failed deletions
+    const successful = results.filter(r => r.status === 'fulfilled').length;
+    const failed = results.filter(r => r.status === 'rejected').length;
+
+    console.log(`File deletion complete. Success: ${successful}, Failed: ${failed}`);
+
+    // Optional: Update tasks to remove file references
+    await Task.updateMany(
+      { 'submission.fileId': { $exists: true } },
+      { $unset: { 'submission.fileId': '' } }
+    );
+
+    return res.status(200).json({
+      message: 'File deletion complete',
+      totalFiles: fileCount,
+      deletedCount: successful,
+      failedCount: failed
+    });
+  } catch (error) {
+    console.error('Error deleting files:', error);
+    return res.status(500).json({ 
+      message: 'Error deleting files', 
+      error: error.message 
+    });
   }
-};
+}};
 
 export default TaskController;

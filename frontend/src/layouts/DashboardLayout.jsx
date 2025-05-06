@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 const DashboardLayout = () => {
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for sidebar visibility
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // State for sidebar visibility
 
 
   return (

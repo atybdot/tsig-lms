@@ -1,20 +1,64 @@
-import { CheckCircle, Clock, Calendar } from 'lucide-react';
+import { CheckCircleIcon, ClockIcon, XCircleIcon } from '@heroicons/react/24/solid';
+import { motion } from 'framer-motion';
+import { Badge } from "@tremor/react";
 
-export function TaskStatus({ completed, submissionDate }) {
-  return (
-    <div className="flex items-center space-x-4 text-sm text-gray-600">
-      <div className="flex items-center">
-        <Calendar className="h-4 w-4 mr-1" />
-        <span>{submissionDate}</span>
-      </div>
-      <div className="flex items-center">
-        {completed ? (
-          <CheckCircle className="h-4 w-4 mr-1 text-green-500" />
-        ) : (
-          <Clock className="h-4 w-4 mr-1 text-yellow-500" />
-        )}
-        <span>{completed ? 'Completed' : 'Pending'}</span>
-      </div>
-    </div>
-  );
-}
+export const TaskStatus = ({ completed, submissionDate }) => {
+  if (completed === 'true') {
+    return (
+      <motion.div 
+        className="flex items-center gap-1.5"
+        initial={{ opacity: 0.8 }}
+        animate={{ opacity: 1 }}
+        whileHover={{ scale: 1.01 }}
+      >
+        <Badge color="emerald" size="sm">
+          <div className="flex items-center gap-1.5">
+            <CheckCircleIcon className="h-4 w-4 text-emerald-500" />
+            <span className="text-xs font-medium text-emerald-700">Completed</span>
+            {submissionDate && submissionDate !== 'Not submitted' && (
+              <span className="text-xs text-gray-500">on {submissionDate}</span>
+            )}
+          </div>
+        </Badge>
+      </motion.div>
+    );
+  } else if (completed === 'pending') {
+    return (
+      <motion.div 
+        className="flex items-center gap-1.5"
+        initial={{ opacity: 0.8 }}
+        animate={{ opacity: 1 }}
+        whileHover={{ scale: 1.01 }}
+      >
+        <Badge color="amber" size="sm">
+          <div className="flex items-center gap-1.5">
+            <ClockIcon className="h-4 w-4 text-amber-500" />
+            <span className="text-xs font-medium text-amber-700">Pending verification</span>
+            {submissionDate && submissionDate !== 'Not submitted' && (
+              <span className="text-xs text-gray-500">submitted {submissionDate}</span>
+            )}
+          </div>
+        </Badge>
+      </motion.div>
+    );
+  } else {
+    return (
+      <motion.div 
+        className="flex items-center gap-1.5"
+        initial={{ opacity: 0.8 }}
+        animate={{ opacity: 1 }}
+        whileHover={{ scale: 1.01 }}
+      >
+        <Badge color="gray" size="sm">
+          <div className="flex items-center gap-1.5">
+            <XCircleIcon className="h-4 w-4 text-gray-500" />
+            <span className="text-xs font-medium text-gray-700">Not submitted</span>
+            {submissionDate && submissionDate !== 'Not submitted' && (
+              <span className="text-xs text-gray-500">{submissionDate}</span>
+            )}
+          </div>
+        </Badge>
+      </motion.div>
+    );
+  }
+};

@@ -154,6 +154,7 @@ const AdminController = {
   // Update task status
   updateTaskStatus: async (req, res) => {
     try {
+      console.log(req.params.taskId, req.body.status);
       const task = await Task.findByIdAndUpdate(
         req.params.taskId,
         { status: req.body.status },
@@ -163,7 +164,7 @@ const AdminController = {
       if (!task) {
         return res.status(404).json({ message: 'Task not found' });
       }
-
+      
       res.json(task);
     } catch (error) {
       res.status(400).json({ message: error.message });
