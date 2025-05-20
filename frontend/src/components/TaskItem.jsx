@@ -1,4 +1,4 @@
-import { useState, Fragment, useRef } from 'react';
+import { useState, Fragment, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, Transition } from '@headlessui/react';
 import { toast } from 'react-toastify';
@@ -15,7 +15,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { TaskStatus } from './TaskStatus';
 
-const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false }) => {
+const TaskItem = ({ task: initialTask, mentee, onTaskVerified, onTaskDeleted, isAdmin = false }) => {
+  const [task, setTask] = useState(initialTask);
   const [imageError, setImageError] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -24,6 +25,10 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [imageZoomed, setImageZoomed] = useState(false);
   const cancelButtonRef = useRef(null);
+  
+  useEffect(() => {
+    setTask(initialTask);
+  }, [initialTask]);
   
   const formatSubmissionDate = (submissionData) => {
     if (!submissionData || !submissionData.submittedAt) {
@@ -95,6 +100,11 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
         throw new Error('Failed to verify task');
       }
       
+      setTask(prevTask => ({
+        ...prevTask,
+        status: "true"
+      }));
+      
       toast.success('Task verified successfully!');
       
       if (onTaskVerified) {
@@ -157,17 +167,18 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
   return (
     <>
       <motion.div 
-        className="group relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md"
+        className="group relative rounded-lg border border-gray-200 bg-white p-3 sm:p-4 shadow-sm transition-all hover:shadow-md"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <h3 className="font-medium text-gray-900">{task.title}</h3>
+        {/* Responsive header layout */}
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div className="space-y-1 flex-grow min-w-0">
+            <h3 className="font-medium text-gray-900 break-words">{task.title}</h3>
             <TaskStatus completed={task.status} submissionDate={formattedSubmissionDate} />
             
-            {/* Resource links */}
+            {/* Resource links with improved wrapping */}
             {task.resources && Object.keys(task.resources).length > 0 && (
               <div className="mt-2">
                 <p className="text-xs font-medium text-gray-500">Resources:</p>
@@ -189,7 +200,8 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
             )}
           </div>
           
-          <div className="flex space-x-2">
+          {/* Action buttons with responsive layout */}
+          <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
             {/* View Task button */}
             <button
               onClick={() => setShowTaskModal(true)}
@@ -199,7 +211,7 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
               <span>View Task</span>
             </button>
 
-            {task.submission && task.status === 'pending' && (
+            {task.submission && task.status !== "true" && (
               <button
                 onClick={handleVerify}
                 disabled={verifying || deleting}
@@ -252,16 +264,17 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
         )}
         
         {task.submission && (
-          <div className="mt-4 rounded-md border border-gray-100 bg-gray-50 p-3">
-            <div className="flex items-center justify-between">
+          <div className="mt-3 sm:mt-4 rounded-md border border-gray-100 bg-gray-50 p-3">
+            {/* Responsive submission header */}
+            <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-1 xs:gap-0">
               <p className="text-xs font-medium text-gray-500">
                 Submitted by: {mentee?.fullname || task.submission.submittedBy}
               </p>
               <p className="text-xs text-gray-500">{formattedSubmissionDate}</p>
             </div>
             
-            {/* Brief submission summary */}
-            <div className="mt-2 flex items-center gap-3">
+            {/* Responsive submission summary */}
+            <div className="mt-2 flex flex-wrap items-center gap-3">
               {task.submission.fileId && (
                 <div className="flex items-center gap-2">
                   <DocumentIcon className="h-4 w-4 text-gray-500" />
@@ -287,8 +300,8 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
         )}
         
         {!task.submission && (
-          <div className="mt-4 flex items-center gap-2 rounded-md bg-amber-50 p-3 text-amber-700">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mt-3 sm:mt-4 flex items-center gap-2 rounded-md bg-amber-50 p-3 text-amber-700">
+            <svg className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span className="text-sm">No submission yet</span>
@@ -296,7 +309,7 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
         )}
       </motion.div>
 
-      {/* Task View Modal */}
+      {/* Improved Task View Modal */}
       <Transition.Root show={showTaskModal} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={() => {
           setShowTaskModal(false);
@@ -315,7 +328,7 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
           </Transition.Child>
 
           <div className="fixed inset-0 z-10 overflow-y-auto">
-            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div className="flex min-h-full items-end justify-center p-2 sm:p-4 text-center sm:items-center">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -325,8 +338,8 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                  <div className="absolute right-0 top-0 pr-4 pt-4">
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all w-full max-w-[95%] sm:max-w-lg">
+                  <div className="absolute right-0 top-0 pr-3 pt-3 z-10">
                     <button
                       type="button"
                       className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -341,13 +354,13 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
                     </button>
                   </div>
                   
-                  <div className="bg-white px-4 pb-4 pt-5 sm:p-6">
+                  <div className="bg-white px-3 py-4 sm:p-6">
                     <div className="sm:flex sm:items-start">
                       <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
                         <DocumentIcon className="h-6 w-6 text-blue-600" aria-hidden="true" />
                       </div>
                       <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                        <Dialog.Title as="h3" className="text-lg font-semibold leading-6 text-gray-900">
+                        <Dialog.Title as="h3" className="text-base sm:text-lg font-semibold leading-6 text-gray-900">
                           {task.title}
                         </Dialog.Title>
                         <div className="mt-2">
@@ -358,19 +371,19 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
                       </div>
                     </div>
 
-                    {/* Resources section */}
+                    {/* Resources section - improved for mobile */}
                     {task.resources && Object.keys(task.resources).length > 0 && (
-                      <div className="mt-6 border-t border-gray-200 pt-4">
+                      <div className="mt-5 border-t border-gray-200 pt-3 sm:pt-4">
                         <h4 className="text-sm font-medium text-gray-700 mb-2">Resources</h4>
                         <div className="space-y-2 rounded-md bg-gray-50 p-3">
                           {Object.entries(task.resources).map(([label, url], idx) => (
-                            <div key={idx} className="flex items-center justify-between rounded-md bg-white p-2 shadow-sm">
-                              <span className="text-sm font-medium text-gray-700">{label}</span>
+                            <div key={idx} className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2 rounded-md bg-white p-2 shadow-sm">
+                              <span className="text-sm font-medium text-gray-700 break-words">{label}</span>
                               <a
                                 href={url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center text-xs font-medium text-blue-600 hover:text-blue-800"
+                                className="flex items-center text-xs font-medium text-blue-600 hover:text-blue-800 whitespace-nowrap"
                               >
                                 View Link
                                 <ArrowTopRightOnSquareIcon className="ml-1 h-3 w-3" />
@@ -381,29 +394,29 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
                       </div>
                     )}
 
-                    {/* Submission section */}
+                    {/* Submission section - improved for mobile */}
                     {task.submission && (
-                      <div className="mt-6 border-t border-gray-200 pt-4">
-                        <div className="flex items-center justify-between mb-3">
+                      <div className="mt-5 border-t border-gray-200 pt-3 sm:pt-4">
+                        <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-1 xs:gap-0 mb-3">
                           <h4 className="text-sm font-medium text-gray-700">Submission Details</h4>
                           <p className="text-xs text-gray-500">
                             Submitted: {formattedSubmissionDate}
                           </p>
                         </div>
 
-                        {/* Link submission */}
+                        {/* Link submission - improved for mobile */}
                         {task.submission.Links && (
                           <div className="mb-4 rounded-md border border-blue-100 bg-blue-50 p-3">
-                            <div className="flex items-center justify-between mb-1">
+                            <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2 xs:gap-0 mb-1">
                               <p className="text-sm font-medium text-blue-700 flex items-center">
-                                <LinkIcon className="mr-1.5 h-4 w-4" />
+                                <LinkIcon className="mr-1.5 h-4 w-4 flex-shrink-0" />
                                 Submitted Link
                               </p>
                               <a
                                 href={task.submission.Links}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="rounded-md bg-white px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100"
+                                className="rounded-md bg-white px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100 whitespace-nowrap"
                               >
                                 Open Link
                                 <ArrowTopRightOnSquareIcon className="ml-1 inline-block h-3 w-3" />
@@ -420,14 +433,14 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
                           </div>
                         )}
 
-                        {/* File submission */}
+                        {/* File submission - improved for mobile */}
                         {task.submission.fileId && (
                           <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
-                            <div className="flex items-center justify-between mb-3">
+                            <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3 mb-3">
                               <div className="flex items-center gap-2">
                                 {getFileIcon(task.submission.fileType || '')}
-                                <div>
-                                  <p className="text-sm font-medium text-gray-900">
+                                <div className="min-w-0 flex-shrink">
+                                  <p className="text-sm font-medium text-gray-900 truncate">
                                     {task.submission.fileName || 'Submitted file'}
                                   </p>
                                   <p className="text-xs text-gray-500">
@@ -449,10 +462,10 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
                               </a>
                             </div>
 
-                            {/* Image preview with zoom capability */}
+                            {/* Image preview with zoom capability - improved for mobile */}
                             {isImageFile(task.submission.fileType) && !imageError && (
                               <div className={`relative overflow-hidden rounded-md bg-white p-1 ${imageZoomed ? 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90' : ''}`}>
-                                <div className={`${imageZoomed ? 'max-h-[90vh] max-w-[90vw] relative' : 'max-h-72'}`}>
+                                <div className={`${imageZoomed ? 'max-h-[90vh] max-w-[90vw] relative' : 'max-h-60'}`}>
                                   <img
                                     src={`${import.meta.env.VITE_BACK_URL}api/tasks/files/${task.submission.fileId}`}
                                     alt="Submission preview"
@@ -462,7 +475,7 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
                                   />
                                   {imageZoomed && (
                                     <button
-                                      className="absolute right-2 top-2 rounded-full bg-white bg-opacity-75 p-1 text-gray-800 hover:bg-opacity-100"
+                                      className="absolute right-2 top-2 rounded-full bg-white bg-opacity-75 p-1.5 text-gray-800 hover:bg-opacity-100"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         toggleImageZoom();
@@ -485,11 +498,11 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
                     )}
                   </div>
 
-                  <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                  <div className="bg-gray-50 px-3 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     {task.submission && task.status === 'pending' && (
                       <button
                         type="button"
-                        className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+                        className="w-full sm:w-auto sm:ml-3 mb-2 sm:mb-0 inline-flex justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500"
                         onClick={() => {
                           handleVerify();
                           setShowTaskModal(false);
@@ -501,7 +514,7 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
                     )}
                     <button
                       type="button"
-                      className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                      className="w-full sm:w-auto inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                       onClick={() => {
                         setShowTaskModal(false);
                         setImageZoomed(false);
@@ -517,7 +530,7 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
         </Dialog>
       </Transition.Root>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation Dialog - improved for mobile */}
       <Transition.Root show={showDeleteConfirm} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={cancelDelete}>
           <Transition.Child
@@ -543,7 +556,7 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all w-full max-w-[95%] sm:max-w-lg sm:p-6">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                       <XCircleIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
@@ -559,23 +572,23 @@ const TaskItem = ({ task, mentee, onTaskVerified, onTaskDeleted, isAdmin = false
                       </div>
                     </div>
                   </div>
-                  <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                  <div className="mt-5 sm:mt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
                     <button
                       type="button"
-                      className={`inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto ${
-                        deleting ? 'bg-red-400' : 'bg-red-600 hover:bg-red-500'
+                      className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:w-auto"
+                      onClick={cancelDelete}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className={`inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm sm:w-auto ${
+                        deleting ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
                       }`}
                       onClick={confirmDelete}
                       disabled={deleting}
                     >
                       {deleting ? 'Deleting...' : 'Delete'}
-                    </button>
-                    <button
-                      type="button"
-                      className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                      onClick={cancelDelete}
-                    >
-                      Cancel
                     </button>
                   </div>
                 </Dialog.Panel>

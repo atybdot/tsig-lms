@@ -54,7 +54,7 @@ const StatsCards = ({ stats, isFiltered = false }) => {
         <Card className={`rounded-lg ${isFiltered ? 'ring-2 ring-emerald-100' : ''}`} decoration="top" decorationColor="emerald">
           <div className="flex items-center justify-between">
             <Text>Completed</Text>
-            <Badge className='text-white rounded-md' color="emerald">{Math.round((stats.completedTasks / stats.totalTasks || 0) * 100)}%</Badge>
+            <Badge className='ring-0 text-white rounded-md' color="emerald">{Math.round((stats.completedTasks / stats.totalTasks || 0) * 100)}%</Badge>
           </div>
           <Metric className="mt-2">{stats.completedTasks}</Metric>
           {isFiltered && (
@@ -74,7 +74,7 @@ const StatsCards = ({ stats, isFiltered = false }) => {
         <Card className={`rounded-lg ${isFiltered ? 'ring-2 ring-amber-100' : ''}`} decoration="top" decorationColor="amber">
           <div className="flex items-center justify-between">
             <Text>Pending Tasks</Text>
-            <Badge className="rounded-md text-white" color="amber">{stats.pendingTasks}</Badge>
+            <Badge className="ring-0 rounded-md text-white" color="amber">{stats.pendingTasks}</Badge>
           </div>
           <Metric className="mt-2">{stats.pendingTasks}</Metric>
           {isFiltered && (

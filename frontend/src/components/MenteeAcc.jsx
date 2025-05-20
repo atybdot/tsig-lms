@@ -25,16 +25,25 @@ const MenteeAcc = ({ mentee, index, highlightDomain = false }) => {
   };
   
   // Handle task verification
-  const handleTaskVerified = async (taskId) => {
+  const handleTaskVerified = async (taskId, updatedTask) => {
     // Update local state
     setTasks(prev => {
       const verifiedTask = prev.assigned.find(task => task._id === taskId);
       
+      if (!verifiedTask) return prev; // No task found
+      
+      // Use the updated task from the API if provided
+      const taskToAdd = updatedTask || {...verifiedTask, status: "true"};
+      
+      // Force re-render by creating new arrays
       return {
         assigned: prev.assigned.filter(task => task._id !== taskId),
-        completed: verifiedTask ? [...prev.completed, {...verifiedTask, status: true}] : prev.completed
+        completed: [...prev.completed, taskToAdd]
       };
     });
+    
+    // Automatically switch to completed tab to show the newly verified task
+    setActiveTab('completed');
   };
 
   const handleTaskDeleted = (taskId) => {
@@ -137,7 +146,7 @@ const MenteeAcc = ({ mentee, index, highlightDomain = false }) => {
                       <div className="grid grid-cols-1 gap-4">
                         {tasks.assigned.map((task) => (
                           <TaskItem 
-                            key={task._id || task.id} 
+                            key={`assigned-${task._id || task.id}`} // Unique key with prefix
                             task={task} 
                             mentee={mentee}
                             onTaskVerified={handleTaskVerified}
@@ -161,7 +170,7 @@ const MenteeAcc = ({ mentee, index, highlightDomain = false }) => {
                       <div className="grid grid-cols-1 gap-4">
                         {tasks.completed.map((task) => (
                           <TaskItem 
-                            key={task._id || task.id}
+                            key={`completed-${task._id || task.id}`} // Unique key with prefix
                             task={task} 
                             mentee={mentee}
                             onTaskVerified={handleTaskVerified}

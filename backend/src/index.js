@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173','https://tsig.onrender.com',"https://cms-frontend-one-delta.vercel.app"],
+  origin: ['http://localhost:5173','http://192.168.29.41:5173','https://tsig.onrender.com',"https://cms-frontend-one-delta.vercel.app"],
   credentials: true,
 }));
 app.use(express.json());
@@ -75,7 +75,7 @@ const startServer = async () => {
     process.exit(1);
   }
 
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
   });
 };

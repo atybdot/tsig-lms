@@ -11,12 +11,12 @@ export const TaskStatus = ({ completed, submissionDate }) => {
         animate={{ opacity: 1 }}
         whileHover={{ scale: 1.01 }}
       >
-        <Badge color="emerald" size="sm">
-          <div className="flex items-center gap-1.5">
-            <CheckCircleIcon className="h-4 w-4 text-emerald-500" />
-            <span className="text-xs font-medium text-emerald-700">Completed</span>
+        <Badge className='ring-0 rounded-md text-white' color="emerald" size="sm">
+          <div className="flex gap-1.5">
+            <CheckCircleIcon className="h-4 w-4 text-white-500" />
+            <span className="text-xs text-white font-medium">Completed</span>
             {submissionDate && submissionDate !== 'Not submitted' && (
-              <span className="text-xs text-gray-500">on {submissionDate}</span>
+              <span className="text-xs">on {submissionDate}</span>
             )}
           </div>
         </Badge>
@@ -30,12 +30,12 @@ export const TaskStatus = ({ completed, submissionDate }) => {
         animate={{ opacity: 1 }}
         whileHover={{ scale: 1.01 }}
       >
-        <Badge color="amber" size="sm">
+        <Badge className='ring-0 rounded-md text-white' color="amber" size="sm">
           <div className="flex items-center gap-1.5">
-            <ClockIcon className="h-4 w-4 text-amber-500" />
+            <ClockIcon className="h-4 w-4 text-white-500" />
             <span className="text-xs font-medium text-amber-700">Pending verification</span>
             {submissionDate && submissionDate !== 'Not submitted' && (
-              <span className="text-xs text-gray-500">submitted {submissionDate}</span>
+              <span className="text-xs">submitted {submissionDate}</span>
             )}
           </div>
         </Badge>
@@ -49,12 +49,12 @@ export const TaskStatus = ({ completed, submissionDate }) => {
         animate={{ opacity: 1 }}
         whileHover={{ scale: 1.01 }}
       >
-        <Badge color="gray" size="sm">
+        <Badge className="ring-0 rounded-md text-white" color="gray" size="sm">
           <div className="flex items-center gap-1.5">
-            <XCircleIcon className="h-4 w-4 text-gray-500" />
-            <span className="text-xs font-medium text-gray-700">Not submitted</span>
+            <XCircleIcon className="h-4 w-4 text-white-500" />
+            <span className="text-xs font-medium text-white">Not submitted</span>
             {submissionDate && submissionDate !== 'Not submitted' && (
-              <span className="text-xs text-gray-500">{submissionDate}</span>
+              <span className="text-xs">{submissionDate}</span>
             )}
           </div>
         </Badge>

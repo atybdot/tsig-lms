@@ -1,5 +1,5 @@
 import { useState, Fragment, useRef, useEffect } from 'react';
-import { Dialog, Transition, Switch } from '@headlessui/react';
+import { Dialog, Transition, Switch, Combobox } from '@headlessui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { 
@@ -8,7 +8,10 @@ import {
   LinkIcon, 
   DocumentTextIcon,
   UserIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  ChevronUpDownIcon,
+  CheckIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 
 function classNames(...classes) {
@@ -34,6 +37,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, onTaskCreated }) => {
   const [resources, setResources] = useState([
     { label: '', url: '' }
   ]);
+  const [menteeQuery, setMenteeQuery] = useState('');
 
   const cancelButtonRef = useRef(null);
   const titleInputRef = useRef(null);
@@ -46,6 +50,14 @@ const CreateTaskModal = ({ isOpen, onClose, users, onTaskCreated }) => {
       }, 100);
     }
   }, [isOpen]);
+
+  // Filter mentees based on search query
+  const filteredMentees = menteeQuery === ''
+    ? users
+    : users.filter((user) => {
+        return user.fullname.toLowerCase().includes(menteeQuery.toLowerCase()) ||
+               (user.id && user.id.toString().includes(menteeQuery));
+      });
 
   const handleAddResource = () => {
     setResources([...resources, { label: '', url: '' }]);
@@ -69,6 +81,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, onTaskCreated }) => {
     setUserId('');
     setIsGlobal(false);
     setResources([{ label: '', url: '' }]);
+    setMenteeQuery('');
   };
 
   const handleSubmit = async (e) => {
@@ -122,6 +135,8 @@ const CreateTaskModal = ({ isOpen, onClose, users, onTaskCreated }) => {
       setLoading(false);
     }
   };
+
+  const selectedMentee = users.find(user => user.id === userId);
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
@@ -205,7 +220,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, onTaskCreated }) => {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         rows={3}
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        className="outline-none block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm pl-3"
                         placeholder="Describe the task in detail..."
                         required
                       />
@@ -213,25 +228,87 @@ const CreateTaskModal = ({ isOpen, onClose, users, onTaskCreated }) => {
                   </FormField>
                   
                   <FormField label="Assign To" required>
-                    <div className="relative mt-1 rounded-md shadow-sm">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <UserIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    <Combobox as="div" value={userId} onChange={setUserId} className="relative mt-1">
+                      <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                          <UserIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        </div>
+                        <Combobox.Input
+                          className="block w-full rounded-md border-gray-300 py-2 pl-10 pr-10 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                          onChange={(e) => setMenteeQuery(e.target.value)}
+                          displayValue={(userId) => {
+                            const user = users.find(user => user.id === userId);
+                            return user ? user.fullname : '';
+                          }}
+                          placeholder="Search by name or ID..."
+                        />
+                        <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                          <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        </Combobox.Button>
                       </div>
-                      <select
-                        id="userId"
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
-                        className="block w-full rounded-md border-gray-300 py-2 pl-10 pr-10 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-                        required
-                      >
-                        <option value="" disabled>Select a mentee</option>
-                        {users.map((user) => (
-                          <option key={user.id} value={user.id} className="py-1">
-                            {user.fullname}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                      
+                      {filteredMentees.length > 0 && (
+                        <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                          {filteredMentees.map((user) => (
+                            <Combobox.Option
+                              key={user.id}
+                              value={user.id}
+                              className={({ active }) =>
+                                classNames(
+                                  'relative cursor-default select-none py-2 pl-3 pr-9',
+                                  active ? 'bg-blue-600 text-white' : 'text-gray-900'
+                                )
+                              }
+                            >
+                              {({ active, selected }) => (
+                                <>
+                                  <div className="flex items-center">
+                                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-800">
+                                      {user.fullname.charAt(0)}
+                                    </span>
+                                    <span className={classNames('ml-3 truncate', selected && 'font-semibold')}>
+                                      {user.fullname}
+                                      <span className="ml-2 text-xs text-gray-500">
+                                        ID: {user.id}
+                                      </span>
+                                    </span>
+                                  </div>
+                                  
+                                  {selected && (
+                                    <span
+                                      className={classNames(
+                                        'absolute inset-y-0 right-0 flex items-center pr-4',
+                                        active ? 'text-white' : 'text-blue-600'
+                                      )}
+                                    >
+                                      <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                    </span>
+                                  )}
+                                </>
+                              )}
+                            </Combobox.Option>
+                          ))}
+                        </Combobox.Options>
+                      )}
+                      
+                      {filteredMentees.length === 0 && menteeQuery !== '' && (
+                        <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-4 px-3 text-center shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                          <p className="text-gray-500">No mentees found matching "{menteeQuery}"</p>
+                        </div>
+                      )}
+                    </Combobox>
+                    
+                    {userId && selectedMentee && (
+                      <div className="mt-2 flex items-center justify-between rounded-md bg-blue-50 px-3 py-2 text-sm">
+                        <div className="flex items-center">
+                          <UserIcon className="mr-2 h-4 w-4 text-blue-500" />
+                          <span className="font-medium text-blue-700">{selectedMentee.fullname}</span>
+                        </div>
+                        <span className="text-xs text-blue-600">
+                          {selectedMentee.domain ? `Domain: ${selectedMentee.domain}` : ''}
+                        </span>
+                      </div>
+                    )}
                   </FormField>
                   
                   {/* Resource Links Section */}
@@ -307,7 +384,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, onTaskCreated }) => {
                     </AnimatePresence>
                   </div>
                   
-                  <div className="flex items-center justify-between pt-2">
+                  {/* <div className="flex items-center justify-between pt-2">
                     <div className="flex items-center">
                       <Switch
                         checked={isGlobal}
@@ -332,7 +409,7 @@ const CreateTaskModal = ({ isOpen, onClose, users, onTaskCreated }) => {
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                   
                   <div className="mt-6 flex items-center justify-end gap-3">
                     <button

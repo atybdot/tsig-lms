@@ -1,6 +1,7 @@
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import tsiglogo from '/favicon.ico'
 import { 
   ChartBarIcon, 
   UserIcon, 
@@ -109,10 +110,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         {/* Logo/Brand */}
         <div className="px-6 py-8">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-xl">T</span>
+            <div className="h-10 w-10 bg-gradient-to-r from-slate-950 to-slate-500 rounded-xl flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-xl"><img className='p-2' src={tsiglogo} alt="" /></span>
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-slate-500 to-slate-700 bg-clip-text text-transparent">
               TSIG CMS
             </h1>
           </div>
@@ -128,7 +129,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <NavLink
                 key={item.path}
                 to={item.path}
-                onClick={toggleSidebar}
                 className={({ isActive }) => `
                   flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
                   ${isActive ? 
@@ -191,10 +191,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleLogout}
-              className="flex items-center gap-1 rounded-full p-2 text-sm text-gray-500 hover:bg-gray-200 transition-colors"
+              className="flex items-center gap-1 group hover:bg-red-500 rounded-full p-2 text-sm transition-colors"
               title="Logout"
             >
-              <ArrowRightOnRectangleIcon className="h-5 w-5" />
+              <ArrowRightOnRectangleIcon className="h-5 w-5 text-red-500 group-hover:text-white" />
             </motion.button>
           </div>
         </div>

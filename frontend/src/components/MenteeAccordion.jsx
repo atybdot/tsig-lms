@@ -75,7 +75,7 @@ const MenteeAccordion = ({ mentees, onFilterChange }) => {
         
         <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {/* Search input */}
-          <div className="relative">
+          <div className="relative flex">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
             </div>
@@ -83,8 +83,8 @@ const MenteeAccordion = ({ mentees, onFilterChange }) => {
               type="search"
               placeholder="Search by name or ID..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full rounded-md border-gray-300 pl-10 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              onChange={(e) => setSearchTerm(e.target.value)} 
+              className="block w-full rounded-md border-gray-300 pl-10 focus:border-blue-500 focus:ring-blue-500 outline-none sm:text-sm"
             />
           </div>
           

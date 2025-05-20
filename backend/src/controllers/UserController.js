@@ -85,7 +85,7 @@ const UserController = {
   // Get user by ID
   getById: async (req, res) => {
     try {
-      console.log(req);
+      // console.log(req);
       const user = await User.findOne({ id: req.params.id })
         .populate('taskDone')
         .populate('taskAssign');
