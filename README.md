@@ -1,7 +1,7 @@
-# TaskMentor
+# Tsig-LMS
 
-## About TaskMentor
-TaskMentor is a comprehensive learning management system designed to streamline the mentorship process through task-based education. Our platform bridges the gap between mentors and mentees with powerful yet intuitive tools.
+## About Tsig-LMS
+Tsig-LMS is a comprehensive learning management system designed to streamline the mentorship process through task-based education. Our platform bridges the gap between mentors and mentees with powerful yet intuitive tools.
 
 ## Key Features
 
@@ -20,7 +20,7 @@ TaskMentor is a comprehensive learning management system designed to streamline 
 - Monitor personal learning journey
 
 ## Submission System
-TaskMentor supports a wide range of file formats to accommodate different learning needs:
+Tsig-LMS supports a wide range of file formats to accommodate different learning needs:
 - Images (.png, .jpg)
 - Documents (.pdf, .docx)
 - Spreadsheets (.xlsx)
@@ -35,4 +35,4 @@ TaskMentor supports a wide range of file formats to accommodate different learni
 
 ---
 
-TaskMentor: Building skills through guided practice.
+Tsig-LMS: Building skills through guided practice.
