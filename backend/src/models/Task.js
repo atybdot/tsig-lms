@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
-import strivers from '../../public/problems_with_ids.json' assert { type: 'json' };
-import { type } from 'os';
 import User from './UserModel.js';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 const taskSchema = new mongoose.Schema({
   user_id: { type: String, required: true }, // Links to a User
@@ -21,6 +22,13 @@ const taskSchema = new mongoose.Schema({
     Links: String,
   }
 }, { timestamps: true });
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const strivers = JSON.parse(
+  readFileSync(path.join(__dirname, '../../public/problems_with_ids.json'), 'utf8')
+);
 
 /**
  * Updates all completed DSA tasks to the next problem in the Strivers course
@@ -62,7 +70,7 @@ taskSchema.statics.updateCompletedDSATasks = async function() {
         task.description = nextProblem.platform;
         task.problemId = nextProblem.id;
         task.resources = resourceMap;
-        task.status = false; // Reset status to incomplete
+        task.status = null; // Reset status to incomplete
         
         await task.save();
         updatedCount++;
@@ -119,8 +127,9 @@ taskSchema.statics.findOrCreateDSATask = async function(userId) {
       title: "Strivers A2Z DSA Course",
       description: firstProblem.platform,
       resources: resourceMap,
+      isGlobal: false,
       problemId: firstProblem.id,
-      status: false // Not completed yet
+      status: null // Not completed yet
     });
 
     const user = await User.findOne({ id: userId });

@@ -2,12 +2,7 @@ import Task from '../models/Task.js';
 import User from '../models/UserModel.js';
 import multer from 'multer';
 import mongoose from 'mongoose';
-import { promises as fs } from 'fs';
-import path from 'path';
 import { Readable } from 'stream';
-import strivers from '../../public/problems_with_ids.json' assert { type: 'json' };
-import { create } from 'domain';
-
 // Set up GridFS
 export let gfs; // Export the gfs variable
 const conn = mongoose.connection;
