@@ -18,7 +18,7 @@ export const initScheduler = () => {
       
       // Clean up task files
       await cleanupTaskFiles(gfs);
-      
+        
       console.log('Midnight maintenance tasks completed successfully');
     } catch (error) {
       console.error('Error in midnight scheduler:', error);
