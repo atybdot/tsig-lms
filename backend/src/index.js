@@ -3,11 +3,15 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import routes from './routes/index.js';
+import cron from 'node-cron';
+import { initScheduler } from './utils/scheduler.js';
 
 // Load environment variables first
 dotenv.config();
 
-const app = express();
+export const app = express();
+const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 // Middleware
 app.use(cors({
@@ -45,8 +49,6 @@ app.use((err, req, res, next) => {
 // Separate database connection function
 const connectDB = async () => {
   try {
-    // It's good practice to reuse the connection in serverless
-    if (mongoose.connection.readyState >= 1) return;
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -55,7 +57,8 @@ const connectDB = async () => {
     });
     console.log('MongoDB connected successfully');
     
-    // initScheduler(); // NOTE: This should be configured as a Vercel Cron Job.
+    // Initialize scheduler after database connection is established
+    initScheduler();
     
     return true;
   } catch (error) {
@@ -64,8 +67,30 @@ const connectDB = async () => {
   }
 };
 
-// Connect to the database when the function initializes.
-connectDB();
+// Initialize server only after DB connection
+const startServer = async () => {
+  const isConnected = await connectDB();
+  
+  if (!isConnected) {
+    console.error('Failed to connect to database. Server will not start.');
+    process.exit(1);
+  }
 
-// Export the app for Vercel
-export default app;
+  app.listen(PORT, HOST, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+};
+
+// Start the application
+startServer();
+
+// Basic error handling
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled Rejection:', error);
+  process.exit(1);
+});
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully');
+  process.exit(0);
+});
