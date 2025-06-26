@@ -6,13 +6,6 @@ const UserController = {
   create: async (req, res) => {
     try {
       const user = new User(req.body);
-      
-      if (!user.password) {
-        return res.status(400).json({ message: 'Password is required' });
-      }
-      
-      const salt = await bcrypt.genSalt(10);  
-      user.password = await bcrypt.hash(user.password, salt); // Hash the password
       const savedUser = await user.save();
       res.status(201).json(savedUser);
     } catch (error) {
