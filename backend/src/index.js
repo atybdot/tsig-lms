@@ -66,7 +66,7 @@ const connectDB = async () => {
   }
 };
 
-// Initialize server only after DB connection
+Initialize server only after DB connection
 const startServer = async () => {
   const isConnected = await connectDB();
   
@@ -75,9 +75,9 @@ const startServer = async () => {
     process.exit(1);
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+  // app.listen(PORT, '0.0.0.0', () => {
+  //   console.log(`Server is running on port ${PORT}`);
+  // });
 };
 
 // Start the application
@@ -93,3 +93,5 @@ process.on('SIGTERM', () => {
   console.log('SIGTERM received. Shutting down gracefully');
   process.exit(0);
 });
+
+export default app;
