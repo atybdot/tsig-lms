@@ -66,7 +66,7 @@ const connectDB = async () => {
   }
 };
 
-Initialize server only after DB connection
+// Initialize server only after DB connection
 const startServer = async () => {
   const isConnected = await connectDB();
   
