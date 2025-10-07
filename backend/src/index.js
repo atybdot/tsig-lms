@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173','http://192.168.29.41:5173','https://tsig.onrender.com',"https://cms-frontend-one-delta.vercel.app"],
+  origin: ["*"],
   credentials: true,
 }));
 app.use(express.json());
