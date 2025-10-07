@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, Navigate, useOutletContext } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router';
+import { Navigate } from 'react-router';
 import TaskModal from '../components/TaskModal';
 import { 
   ChevronRightIcon,

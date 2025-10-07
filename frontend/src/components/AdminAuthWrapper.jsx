@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router/dom'
 
 const AdminAuthWrapper = ({ children, path = '/dashboard', notUser = true }) => {
     const user = JSON.parse(localStorage.getItem('adminData'));
